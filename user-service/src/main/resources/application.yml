@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/lms
+    url: jdbc:mysql://localhost:3307/lms
     username: root
     password: qwer1234
 

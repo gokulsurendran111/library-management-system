@@ -8,8 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,46 +24,49 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Autowired
     private BorrowRepository borrowRepository;
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${book.service.url}")
+    private String bookServiceUrl;
 
     @Override
     public Borrow createBorrow(BorrowDTO dto) {
+        LocalDate currentDate = LocalDate.now();
         Borrow borrow = Borrow.builder()
                 .userId(dto.getUserId())
                 .bookId(dto.getBookId())
-                .borrowDate(dto.getBorrowDate())
-                .returnDate(dto.getReturnDate())
+                .borrowDate(currentDate)
+                .dueDate(currentDate.plusDays(30))
                 .build();
-
-        Borrow saved = borrowRepository.save(borrow);
-        return saved;
+        String url = bookServiceUrl + "/" + dto.getBookId() + "/availability?available=false";
+        restTemplate.put(url, HttpEntity.EMPTY);
+        return borrowRepository.save(borrow);
     }
 
     @Override
     public Borrow getBorrowById(Long id) {
-        Borrow borrow = borrowRepository.findById(id)
+        return borrowRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow record not found"));
-        return borrow;
     }
 
     @Override
     public List<Borrow> getAllBorrows() {
-        return borrowRepository.findAll()
-                .stream()
-                .collect(Collectors.toList());
+        return new ArrayList<>(borrowRepository.findAll());
     }
 
     @Override
     public Borrow updateBorrow(Long id, BorrowDTO dto) {
         Borrow borrow = borrowRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+        LocalDate currentDate = LocalDate.now();
 
         borrow.setUserId(dto.getUserId());
         borrow.setBookId(dto.getBookId());
-        borrow.setBorrowDate(dto.getBorrowDate());
-        borrow.setReturnDate(dto.getReturnDate());
+        borrow.setBorrowDate(currentDate);
+        borrow.setReturnDate(currentDate.plusDays(30));
 
-        Borrow updated = borrowRepository.save(borrow);
-        return updated;
+        return borrowRepository.save(borrow);
     }
 
     @Override
@@ -67,8 +76,7 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public Borrow borrowBook(BorrowDTO dto) {
-        Borrow borrow = createBorrow(dto);
-        return borrow;
+        return createBorrow(dto);
     }
 
     @Override
@@ -78,11 +86,8 @@ public class BorrowServiceImpl implements BorrowService {
 
     private BorrowDTO toDTO(Borrow borrow) {
         return BorrowDTO.builder()
-                .id(borrow.getId())
                 .userId(borrow.getUserId())
                 .bookId(borrow.getBookId())
-                .borrowDate(borrow.getBorrowDate())
-                .returnDate(borrow.getReturnDate())
                 .build();
     }
 }

@@ -1,7 +1,6 @@
 package com.lms.book_service.service.impl;
 
-import com.lms.book_service.dto.BookRequestDTO;
-import com.lms.book_service.dto.BookResponseDTO;
+import com.lms.book_service.dto.BookDTO;
 import com.lms.book_service.model.Book;
 import com.lms.book_service.repository.BookRepository;
 import com.lms.book_service.service.BookService;
@@ -19,7 +18,7 @@ public class BookServiceImpl implements BookService {
     private BookRepository repository;
 
     @Override
-    public BookResponseDTO addBook(BookRequestDTO dto) {
+    public BookDTO addBook(BookDTO dto) {
         Book book = Book.builder()
                 .title(dto.getTitle())
                 .author(dto.getAuthor())
@@ -31,27 +30,28 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookResponseDTO> getAllBooks() {
+    public List<BookDTO> getAllBooks() {
         return repository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BookResponseDTO getBookById(Long id) {
+    public BookDTO getBookById(Long id) {
         Book book = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Book not found"));
         return toDTO(book);
     }
 
     @Override
-    public BookResponseDTO updateBook(Long id, BookRequestDTO dto) {
+    public BookDTO updateBook(Long id, BookDTO dto) {
         Book book = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Book not found"));
 
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());
         book.setIsbn(dto.getIsbn());
+        book.setAvailable(dto.isAvailable());
 
         return toDTO(repository.save(book));
     }
@@ -63,8 +63,15 @@ public class BookServiceImpl implements BookService {
         repository.delete(book);
     }
 
-    private BookResponseDTO toDTO(Book book) {
-        return BookResponseDTO.builder()
+    @Override
+    public void updateBookAvailability(Long id, boolean available) {
+        BookDTO dto = getBookById(id);
+        dto.setAvailable(available);
+        updateBook(id, dto);
+    }
+
+    private BookDTO toDTO(Book book) {
+        return BookDTO.builder()
                 .id(book.getId())
                 .title(book.getTitle())
                 .author(book.getAuthor())
