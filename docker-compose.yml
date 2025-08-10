@@ -26,6 +26,8 @@ services:
     container_name: discovery-server
     ports:
       - "8761:8761"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     networks:
       - lms-network
     healthcheck:
@@ -33,6 +35,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+      - "5005:5005"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/lms
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: qwer1234
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - lms-network
 
   book-service:
     build:
@@ -71,6 +94,22 @@ services:
 #      - discovery-server
       mysql:
         condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - lms-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+      - "5006:5006"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
       discovery-server:
         condition: service_healthy
     networks:

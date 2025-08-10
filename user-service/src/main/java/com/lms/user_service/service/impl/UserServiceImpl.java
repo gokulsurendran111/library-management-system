@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        return repository.findAll().stream().map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail())).collect(Collectors.toList());
+        return repository.findAll().stream().map(user -> new UserDTO(user.getId(), user.getUserName(), user.getEmail())).collect(Collectors.toList());
     }
 
     @Override
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
         return UserDTO.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .userName(user.getUserName())
                 .email(user.getEmail())
                 .build();
     }
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long id, User user) {
         User existing = getUserEntityById(id);
-        existing.setName(user.getName());
+        existing.setUserName(user.getUserName());
         existing.setEmail(user.getEmail());
         return repository.save(existing);
     }
