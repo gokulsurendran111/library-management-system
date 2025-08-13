@@ -19,6 +19,30 @@ services:
       timeout: 5s
       retries: 5
 
+  kafka-kraft:
+    image: bitnami/kafka:latest
+    container_name: kafka-kraft
+    ports:
+      - "9092:9092"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CONTROLLER://0.0.0.0:9093,PLAINTEXT://0.0.0.0:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-kraft:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-kraft:9093
+    volumes:
+      - kafka_data:/bitnami/kafka
+    networks:
+      - lms-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   discovery-server:
     build:
       context: ./discovery-server
@@ -74,6 +98,8 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
+      kafka-kraft:
+        condition: service_healthy
     networks:
       - lms-network
 
@@ -84,17 +110,34 @@ services:
     container_name: borrow-service
     ports:
       - "8083:8083"
+      - "5007:5007"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/lms
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: qwer1234
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     depends_on:
-#      - mysql
-#      - discovery-server
       mysql:
         condition: service_healthy
       discovery-server:
+        condition: service_healthy
+    networks:
+      - lms-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-kraft:9092
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      kafka-kraft:
         condition: service_healthy
     networks:
       - lms-network
@@ -117,6 +160,8 @@ services:
 
 volumes:
   mysql_data:
+  kafka_data:
 
 networks:
   lms-network:
+    driver: bridge

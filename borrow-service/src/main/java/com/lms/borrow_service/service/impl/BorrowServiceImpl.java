@@ -1,12 +1,11 @@
 package com.lms.borrow_service.service.impl;
 
 import com.lms.borrow_service.dto.BorrowDTO;
+import com.lms.borrow_service.events.BookBorrowedEvent;
+import com.lms.borrow_service.kafka.BorrowEventProducer;
 import com.lms.borrow_service.model.Borrow;
 import com.lms.borrow_service.repository.BorrowRepository;
 import com.lms.borrow_service.service.BorrowService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,10 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BorrowServiceImpl implements BorrowService {
@@ -26,6 +23,12 @@ public class BorrowServiceImpl implements BorrowService {
     private BorrowRepository borrowRepository;
     @Autowired
     private RestTemplate restTemplate;
+
+    private BorrowEventProducer eventProducer;
+
+    public BorrowServiceImpl(BorrowEventProducer eventProducer) {
+        this.eventProducer = eventProducer;
+    }
 
     @Value("${book.service.url}")
     private String bookServiceUrl;
@@ -76,7 +79,17 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public Borrow borrowBook(BorrowDTO dto) {
-        return createBorrow(dto);
+        Borrow borrow = createBorrow(dto);
+        BookBorrowedEvent event = new BookBorrowedEvent(
+                borrow.getUserId(),
+                dto.getUserEmail(),
+                borrow.getBookId(),
+                dto.getBookTitle(),
+                borrow.getBorrowDate(),
+                borrow.getDueDate()
+        );
+        eventProducer.sendBookBorrowedEvent(event);
+        return borrow;
     }
 
     @Override

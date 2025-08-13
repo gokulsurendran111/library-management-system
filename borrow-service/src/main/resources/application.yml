@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: borrow-service
+  kafka:
+    bootstrap-servers: kafka-kraft:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}

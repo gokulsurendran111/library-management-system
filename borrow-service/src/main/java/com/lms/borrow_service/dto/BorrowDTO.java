@@ -10,5 +10,7 @@ import java.time.LocalDate;
 @Builder
 public class BorrowDTO {
     private Long userId;
+    private String userEmail;
     private Long bookId;
+    private String bookTitle;
 }

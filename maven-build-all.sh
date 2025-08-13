@@ -46,6 +46,12 @@ cd borrow-service
 echo "✅ borrow-service build complete."
 cd ..
 
+echo "-> Building notification-service..."
+cd notification-service
+./mvnw clean package -DskipTests
+echo "✅ notification-service build complete."
+cd ..
+
 echo "---------------------------------------------------"
 echo "🎉 All microservices have been built successfully!"
 echo "You can now run 'docker-compose up --build' to start your application."
