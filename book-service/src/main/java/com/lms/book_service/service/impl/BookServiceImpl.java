@@ -5,6 +5,9 @@ import com.lms.book_service.model.Book;
 import com.lms.book_service.repository.BookRepository;
 import com.lms.book_service.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,6 +71,18 @@ public class BookServiceImpl implements BookService {
         BookDTO dto = getBookById(id);
         dto.setAvailable(available);
         updateBook(id, dto);
+    }
+
+    @Override
+    public Page<Book> getAllBooks(PageRequest request) {
+        return repository.findAll(request);
+    }
+
+    @Override
+    public Page<Book> searchBooks(String pattern, Pageable pageable) {
+        return repository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(
+                pattern, pattern, pageable
+        );
     }
 
     private BookDTO toDTO(Book book) {

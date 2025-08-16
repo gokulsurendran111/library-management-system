@@ -4,6 +4,7 @@ import com.lms.user_service.dto.UserDTO;
 import com.lms.user_service.model.User;
 import com.lms.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +26,15 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public UserDTO getById(@PathVariable Long id) {
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        UserDTO userDTO = userService.findByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PutMapping("/{id}")

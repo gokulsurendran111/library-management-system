@@ -1,0 +1,186 @@
+.books-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  height: 100vh;
+}
+
+/* LEFT SIDEBAR */
+.sidebar {
+  background-color: teal;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar li:hover {
+  background-color: #006666;
+  border-radius: 5px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  padding: 20px;
+  background-color: #e6f7f7;
+}
+
+.books-title {
+  color: teal;
+  margin-bottom: 15px;
+}
+
+.books-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+.adv-search {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: blue;
+  text-decoration: underline;
+  height: 100%;
+  cursor: pointer;
+}
+
+.books-search,
+.books-filter {
+  padding: 8px;
+  border: 1px solid teal;
+  border-radius: 5px;
+  width: 220px
+}
+
+.books-filter {
+  background-color: white;
+  color: teal;
+}
+
+.books-table {
+  width: 100%;
+  border-collapse: collapse;
+  padding-bottom: 20px;
+}
+
+.books-table th,
+.books-table td {
+  border: 1px solid teal;
+  padding: 8px;
+  text-align: left;
+}
+
+.books-table th {
+  background-color: teal;
+  color: white;
+}
+
+.sort-btn {
+  float: right;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.add-to-cart-btn {
+  background-color: teal;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 15px;
+  /* width: 50%; */
+  cursor: pointer;
+}
+
+.books-search-btn {
+  background-color: teal;
+  color: white;
+  padding: 8px;
+  border-radius: 5px;
+  /* border: none;
+  /* margin-top: 15px; */
+  /* width: 50%; */
+  cursor: pointer;
+}
+
+/* RIGHT SIDEBAR */
+.cart-sidebar {
+  background-color: white;
+  border-left: 2px solid teal;
+  padding: 20px;
+}
+
+.cart-sidebar h2 {
+  color: teal;
+  margin-bottom: 10px;
+}
+
+.cart-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.cart-sidebar li {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.borrow-all-btn {
+  background-color: teal;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 15px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.borrow-all-btn:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+
+.books-pagination {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.books-pagination button {
+  border: 1px solid teal;
+  background-color: white;
+  color: teal;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.books-pagination button.active {
+  background-color: teal;
+  color: white;
+}
+
+.books-pagination button:hover {
+  background-color: #e6f7f7;
+}

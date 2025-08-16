@@ -35,6 +35,18 @@ spring:
                 - Path=/api/borrows/**
               filters:
                 - StripPrefix=1
+          globalcors:
+            corsConfigurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
 
 eureka:
   client:

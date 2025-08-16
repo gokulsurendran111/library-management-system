@@ -3,17 +3,33 @@ package com.lms.api_gateway.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final long validityInMs = 3600000; // 1 hour
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private Key key;
+
+    @PostConstruct
+    public void initKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()

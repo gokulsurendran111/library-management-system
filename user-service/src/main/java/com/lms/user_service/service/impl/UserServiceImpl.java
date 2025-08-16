@@ -5,6 +5,7 @@ import com.lms.user_service.model.User;
 import com.lms.user_service.repository.UserRepository;
 import com.lms.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,19 +16,19 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @Override
     public User register(User user) {
-        if (repository.existsByEmail(user.getEmail())) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
-        return repository.findAll().stream().map(user -> new UserDTO(user.getId(), user.getUserName(), user.getEmail())).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(user -> new UserDTO(user.getId(), user.getUserName(), user.getEmail())).collect(Collectors.toList());
     }
 
     @Override
@@ -41,8 +42,14 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    public UserDTO findByUsername(String username) {
+        return userRepository.findByUserName(username)
+                .map(user -> new UserDTO(user.getId(), user.getUserName(), user.getEmail()))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
     private User getUserEntityById(Long id) {
-        return repository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
@@ -52,11 +59,11 @@ public class UserServiceImpl implements UserService {
         User existing = getUserEntityById(id);
         existing.setUserName(user.getUserName());
         existing.setEmail(user.getEmail());
-        return repository.save(existing);
+        return userRepository.save(existing);
     }
 
     @Override
     public void deleteUser(Long id) {
-        repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 }

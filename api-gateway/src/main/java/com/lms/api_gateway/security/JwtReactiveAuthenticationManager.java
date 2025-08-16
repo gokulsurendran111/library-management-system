@@ -1,5 +1,6 @@
 package com.lms.api_gateway.security;
 
+import com.lms.api_gateway.model.Role;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,9 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
 
         return jwtUtil.validateAndExtractUsername(authToken)
                 .map(username -> {
-                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(Role.ADMIN.name()),
+                            new SimpleGrantedAuthority(Role.LIBRARIAN.name()),
+                            new SimpleGrantedAuthority(Role.PATRON.name()));
                     return new UsernamePasswordAuthenticationToken(username, null, authorities);
                 });
     }

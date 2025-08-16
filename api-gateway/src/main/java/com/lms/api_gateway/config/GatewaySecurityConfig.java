@@ -3,10 +3,12 @@ package com.lms.api_gateway.config;
 import com.lms.api_gateway.security.JwtReactiveAuthenticationManager;
 import com.lms.api_gateway.security.JwtSecurityContextRepository;
 import com.lms.api_gateway.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -16,7 +18,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class GatewaySecurityConfig {
 
-    private final JwtUtil jwtUtil = new JwtUtil();
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -35,6 +38,7 @@ public class GatewaySecurityConfig {
                     return chain.filter(exchange);
                 }, SecurityWebFiltersOrder.AUTHENTICATION)
                 .authorizeExchange(authorize -> authorize
+                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
                         .anyExchange().authenticated()
                 ).build();

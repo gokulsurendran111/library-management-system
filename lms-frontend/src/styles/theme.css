@@ -1,0 +1,32 @@
+:root {
+  --bs-primary: #008080; /* Teal */
+  --bs-primary-rgb: 0, 128, 128;
+  --bs-body-bg: #ffffff; /* White background */
+  --bs-body-color: #212529;
+}
+
+body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  background-color: #006666; /* Darker teal on hover */
+  border-color: #006666;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.text-teal {
+  color: var(--bs-primary);
+}
+
